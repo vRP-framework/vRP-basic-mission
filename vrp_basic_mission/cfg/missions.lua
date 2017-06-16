@@ -3,7 +3,10 @@ local cfg = {}
 
 cfg.lang = "en"
 
--- map of permission -> 
+-- REPAIR
+
+-- map of permission -> repair config
+-- (multiple repair permissions can work)
 --- chance: chance factor per minute (1 => everytime, 10 => 1/10)
 --- title
 --- positions
@@ -58,6 +61,32 @@ cfg.repair = {
       {2356.48413085938,1836.69982910156,102.337211608887}
     },
     reward = 2500
+  }
+}
+
+-- DELIVERY
+
+local common_delivery_positions = {
+  {-1087.20959472656,479.4970703125,81.5277786254883},
+  {-1215.48083496094,457.809478759766,91.9756546020508},
+  {-1277.36901855469,496.794769287109,97.8074340820313},
+  {-1380.82360839844,474.517272949219,105.052627563477},
+  {-1063.642578125,-1054.95007324219,2.15036153793335},
+  {-1113.640625,-1068.970703125,2.15036201477051},
+  {-1161.85144042969,-1099.05871582031,2.17665767669678}
+}
+
+-- map of permission => delivery config
+--- items: map of idname => {min_amount,max_amount,reward_per_item}
+--- positions
+-- only one delivery permission can be used per player (no permission selection, only one will work)
+cfg.delivery = {
+  ["mission.delivery.food"] = {
+    positions = common_delivery_positions,
+    items = {
+      ["tacos"] = {0,8,50},
+      ["water"] = {0,8,40}
+    }
   }
 }
 
