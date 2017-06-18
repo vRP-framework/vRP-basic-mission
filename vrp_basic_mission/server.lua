@@ -48,7 +48,7 @@ function task_mission()
 
                             -- last step
                             if i == v.steps then
-                              vRP.giveMoney({player,v.reward})
+                              vRP.giveMoney({user_id,v.reward})
                               vRPclient.notify(player,{glang.money.received({v.reward})})
                             end
                           end)
@@ -116,7 +116,7 @@ function task_mission()
                       vRP.tryGetInventoryItem({user_id,idname,amount},function(ok)
                         if ok then -- deliver
                           local reward = v.items[idname][3]*amount
-                          vRP.giveMoney({player,reward})
+                          vRP.giveMoney({user_id,reward})
                           vRPclient.notify(player,{glang.money.received({reward})})
                           todo = todo-1
                           delivery_items[idname] = 0
