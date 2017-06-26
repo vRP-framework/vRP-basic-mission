@@ -11,11 +11,19 @@ local lang = Lang.new(require("resources/vrp_basic_mission/cfg/lang/"..cfg.lang)
 vRP = Proxy.getInterface("vRP")
 vRPclient = Tunnel.getInterface("vRP","vRP_basic_mission")
 
-local items = {}
+-- load item definitions for the delivery config
+local item_defs = {}
 SetTimeout(5000,function()
-  vRP.getInventoryItemDefinitions({},function(defs)
-    items = defs
-  end)
+  for k,v in pairs(cfg.delivery) do
+    for l,w in pairs(v.items) do
+      if item_defs[l] == nil then
+        item_defs[l] = {}
+        vRP.getItemDefinition({l},function(name,desc,weight)
+          item_defs[l] = {name,desc,weight}
+        end)
+      end
+    end
+  end
 end)
 
 function task_mission()
@@ -28,7 +36,7 @@ function task_mission()
         vRP.getUserSource({user_id},function(player)
           vRP.hasMission({player},function(has_mission)
             if not has_mission then
-              if math.random(1,v.chance) == 1 then -- chance check
+              if math.random(1,v.chance+1) == 1 then -- chance check
                 -- build mission
                 local mdata = {}
                 mdata.name = lang.repair({v.title})
@@ -39,7 +47,7 @@ function task_mission()
                   local step = {
                     text = lang.repair({v.title}).."<br />"..lang.reward({v.reward}),
                     onenter = function(player, area)
-                      vRP.tryGetInventoryItem({user_id,"repairkit",1},function(ok)
+                      vRP.tryGetInventoryItem({user_id,"repairkit",1,true},function(ok)
                         if ok then -- repair
                           vRPclient.playAnim(player,{false,{task="WORLD_HUMAN_WELDING"},false})
                           SetTimeout(15000, function()
@@ -52,16 +60,10 @@ function task_mission()
                               vRPclient.notify(player,{glang.money.received({v.reward})})
                             end
                           end)
-                        else
-                          local name = "repairkit"
-                          if items[name] ~= nil then
-                            name = items[name].name
-                          end
-                          vRPclient.notify(player,{glang.inventory.missing({name,1})})
                         end
                       end)
                     end,
-                    position = v.positions[math.random(1,#v.positions)]
+                    position = v.positions[math.random(1,#v.positions+1)]
                   }
 
                   table.insert(mdata.steps, step)
@@ -93,13 +95,10 @@ function task_mission()
               local todo = 0
               local delivery_items = {}
               for idname,data in pairs(v.items) do
-                local item = items[idname]
-                if item then
-                  local amount = math.random(data[1],data[2])
-                  if amount > 0 then
-                    delivery_items[idname] = amount
-                    todo = todo+1
-                  end
+                local amount = math.random(data[1],data[2]+1)
+                if amount > 0 then
+                  delivery_items[idname] = amount
+                  todo = todo+1
                 end
               end
 
@@ -108,12 +107,7 @@ function task_mission()
                 onenter = function(player, area)
                   for idname,amount in pairs(delivery_items) do
                     if amount > 0 then -- check if not done
-                      local name = idname
-                      if items[idname] ~= nil then
-                        name = items[idname].name
-                      end
-
-                      vRP.tryGetInventoryItem({user_id,idname,amount},function(ok)
+                      vRP.tryGetInventoryItem({user_id,idname,amount,true},function(ok)
                         if ok then -- deliver
                           local reward = v.items[idname][3]*amount
                           vRP.giveMoney({user_id,reward})
@@ -123,22 +117,17 @@ function task_mission()
                           if todo == 0 then -- all received, finish mission
                             vRP.nextMissionStep({player})
                           end
-                        else
-                          vRPclient.notify(player,{glang.inventory.missing({name,amount})})
                         end
                       end)
                     end
                   end
                 end,
-                position = v.positions[math.random(1,#v.positions)]
+                position = v.positions[math.random(1,#v.positions+1)]
               }
 
               -- mission display
               for idname,amount in pairs(delivery_items) do
-                local item = items[idname]
-                if item then
-                  step.text = step.text..lang.delivery.item({item.name,amount}).."<br />"
-                end
+                step.text = step.text..lang.delivery.item({item_defs[idname][1],amount}).."<br />"
               end
 
               mdata.steps = {step}
