@@ -20,7 +20,7 @@ function task_mission()
       local user_id = w
       local player = vRP.getUserSource({user_id})
       if not vRP.hasMission({player}) then
-        if math.random(1,v.chance+1) == 1 then -- chance check
+        if math.random(1,v.chance) == 1 then -- chance check
           -- build mission
           local mdata = {}
           mdata.name = lang.repair({v.title})
@@ -45,7 +45,7 @@ function task_mission()
                   end)
                 end
               end,
-              position = v.positions[math.random(1,#v.positions+1)]
+              position = v.positions[math.random(1,#v.positions)]
             }
 
             table.insert(mdata.steps, step)
@@ -73,7 +73,7 @@ function task_mission()
         local todo = 0
         local delivery_items = {}
         for idname,data in pairs(v.items) do
-          local amount = math.random(data[1],data[2]+1)
+          local amount = math.random(data[1],data[2])
           if amount > 0 then
             delivery_items[idname] = amount
             todo = todo+1
@@ -98,7 +98,7 @@ function task_mission()
               end
             end
           end,
-          position = v.positions[math.random(1,#v.positions+1)]
+          position = v.positions[math.random(1,#v.positions)]
         }
 
         -- mission display
