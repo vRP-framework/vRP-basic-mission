@@ -3,14 +3,11 @@ local Tunnel = module("vrp", "lib/Tunnel")
 local Proxy = module("vrp", "lib/Proxy")
 local Luang = module("vrp", "lib/Luang")
 local cfg = module("vrp_basic_mission", "cfg/missions")
-async = module("vrp", "lib/Luaseq").async
 
 -- load global and local languages
-local gLang = Luang()
-gLang:loadLocale(cfg.lang, module("vrp", "cfg/lang/"..cfg.lang) or {})
-glang = gLang.lang[cfg.lang]
 local Lang = Luang()
-Lang:loadLocate(cfg.lang, module("vrp_basic_mission", "cfg/lang/"..cfg.lang) or {})
+Lang:loadLocale(cfg.lang, module("vrp", "cfg/lang/"..cfg.lang) or {})
+Lang:loadLocale(cfg.lang, module("vrp_basic_mission", "cfg/lang/"..cfg.lang) or {})
 lang = Lang.lang[cfg.lang]
 
 vRP = Proxy.getInterface("vRP")
