@@ -34,21 +34,23 @@ function task_mission()
               local step = {
                 text = lang.repair({v.title}).."<br />"..lang.reward({v.reward}),
                 onenter = function(player, area)
-                  if vRP.tryGetInventoryItem(user_id,"repairkit",1,true) then
-                    vRPclient.playAnim(player,false,{task="WORLD_HUMAN_WELDING"},false)
-                    SetTimeout(15000, function()
-                      async(function()
-                        vRP.nextMissionStep(player)
-                        vRPclient.stopAnim(player,false)
+                  async(function()
+                    if vRP.tryGetInventoryItem(user_id,"repairkit",1,true) then
+                      vRPclient.playAnim(player,false,{task="WORLD_HUMAN_WELDING"},false)
+                      SetTimeout(15000, function()
+                        async(function()
+                          vRP.nextMissionStep(player)
+                          vRPclient.stopAnim(player,false)
 
-                        -- last step
-                        if i == v.steps then
-                          vRP.giveMoney(user_id,v.reward)
-                          vRPclient.notify(player, glang.money.received({v.reward}))
-                        end
-                      end, true)
-                    end)
-                  end
+                          -- last step
+                          if i == v.steps then
+                            vRP.giveMoney(user_id,v.reward)
+                            vRPclient.notify(player, glang.money.received({v.reward}))
+                          end
+                        end, true)
+                      end)
+                    end
+                  end, true)
                 end,
                 position = v.positions[math.random(1,#v.positions)]
               }
@@ -88,20 +90,22 @@ function task_mission()
           local step = {
             text = "",
             onenter = function(player, area)
-              for idname,amount in pairs(delivery_items) do
-                if amount > 0 then -- check if not done
-                  if vRP.tryGetInventoryItem(user_id,idname,amount,true) then
-                    local reward = v.items[idname][3]*amount
-                    vRP.giveMoney(user_id,reward)
-                    vRPclient.notify(player,glang.money.received({reward}))
-                    todo = todo-1
-                    delivery_items[idname] = 0
-                    if todo == 0 then -- all received, finish mission
-                      vRP.nextMissionStep(player)
+              async(function()
+                for idname,amount in pairs(delivery_items) do
+                  if amount > 0 then -- check if not done
+                    if vRP.tryGetInventoryItem(user_id,idname,amount,true) then
+                      local reward = v.items[idname][3]*amount
+                      vRP.giveMoney(user_id,reward)
+                      vRPclient.notify(player,glang.money.received({reward}))
+                      todo = todo-1
+                      delivery_items[idname] = 0
+                      if todo == 0 then -- all received, finish mission
+                        vRP.nextMissionStep(player)
+                      end
                     end
                   end
                 end
-              end
+              end)
             end,
             position = v.positions[math.random(1,#v.positions)]
           }
