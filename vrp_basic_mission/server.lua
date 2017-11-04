@@ -37,14 +37,16 @@ function task_mission()
                   if vRP.tryGetInventoryItem(user_id,"repairkit",1,true) then
                     vRPclient.playAnim(player,false,{task="WORLD_HUMAN_WELDING"},false)
                     SetTimeout(15000, function()
-                      vRP.nextMissionStep(player)
-                      vRPclient.stopAnim(player,false)
+                      async(function()
+                        vRP.nextMissionStep(player)
+                        vRPclient.stopAnim(player,false)
 
-                      -- last step
-                      if i == v.steps then
-                        vRP.giveMoney(user_id,v.reward)
-                        vRPclient.notify(player, glang.money.received({v.reward}))
-                      end
+                        -- last step
+                        if i == v.steps then
+                          vRP.giveMoney(user_id,v.reward)
+                          vRPclient.notify(player, glang.money.received({v.reward}))
+                        end
+                      end, true)
                     end)
                   end
                 end,
@@ -119,7 +121,7 @@ function task_mission()
       end
     end
 
-  SetTimeout(60000,task_mission)
+    SetTimeout(60000,task_mission)
   end, true)
 end
 task_mission()
