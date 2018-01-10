@@ -11,7 +11,7 @@ Lang:loadLocale(cfg.lang, module("vrp_basic_mission", "cfg/lang/"..cfg.lang) or 
 lang = Lang.lang[cfg.lang]
 
 vRP = Proxy.getInterface("vRP")
-vRPclient = Tunnel.getInterface("vRP","vRP_basic_mission")
+vRPclient = Tunnel.getInterface("vRP")
 
 function task_mission()
   -- REPAIR
@@ -34,15 +34,15 @@ function task_mission()
               text = lang.repair({v.title}).."<br />"..lang.reward({v.reward}),
               onenter = function(player, area)
                 if vRP.tryGetInventoryItem(user_id,"repairkit",1,true) then
-                  vRPclient.playAnim(player,false,{task="WORLD_HUMAN_WELDING"},false)
+                  vRPclient._playAnim(player,false,{task="WORLD_HUMAN_WELDING"},false)
                   SetTimeout(15000, function()
                     vRP.nextMissionStep(player)
-                    vRPclient.stopAnim(player,false)
+                    vRPclient._stopAnim(player,false)
 
                     -- last step
                     if i == v.steps then
                       vRP.giveMoney(user_id,v.reward)
-                      vRPclient.notify(player, glang.money.received({v.reward}))
+                      vRPclient._notify(player, glang.money.received({v.reward}))
                     end
                   end)
                 end
@@ -90,7 +90,7 @@ function task_mission()
                 if vRP.tryGetInventoryItem(user_id,idname,amount,true) then
                   local reward = v.items[idname][3]*amount
                   vRP.giveMoney(user_id,reward)
-                  vRPclient.notify(player,glang.money.received({reward}))
+                  vRPclient._notify(player,glang.money.received({reward}))
                   todo = todo-1
                   delivery_items[idname] = 0
                   if todo == 0 then -- all received, finish mission
