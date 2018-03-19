@@ -21,7 +21,7 @@ function task_mission()
     for l,w in pairs(users) do
       local user_id = w
       local player = vRP.getUserSource(user_id)
-      if not vRP.hasMission(player) then
+      if vRP.isSpawned(user_id) and not vRP.hasMission(player) then
         if math.random(1,v.chance) == 1 then -- chance check
           -- build mission
           local mdata = {}
@@ -42,7 +42,7 @@ function task_mission()
                     -- last step
                     if i == v.steps then
                       vRP.giveMoney(user_id,v.reward)
-                      vRPclient._notify(player, glang.money.received({v.reward}))
+                      vRPclient._notify(player, lang.money.received({v.reward}))
                     end
                   end)
                 end
@@ -66,7 +66,7 @@ function task_mission()
     for l,w in pairs(users) do
       local user_id = w
       local player = vRP.getUserSource(user_id)
-      if not vRP.hasMission(player) then
+      if vRP.isSpawned(user_id) and not vRP.hasMission(player) then
         -- build mission
         local mdata = {}
         mdata.name = lang.delivery.title()
@@ -90,7 +90,7 @@ function task_mission()
                 if vRP.tryGetInventoryItem(user_id,idname,amount,true) then
                   local reward = v.items[idname][3]*amount
                   vRP.giveMoney(user_id,reward)
-                  vRPclient._notify(player,glang.money.received({reward}))
+                  vRPclient._notify(player,lang.money.received({reward}))
                   todo = todo-1
                   delivery_items[idname] = 0
                   if todo == 0 then -- all received, finish mission
@@ -106,7 +106,7 @@ function task_mission()
         -- mission display
         for idname,amount in pairs(delivery_items) do
           local name = vRP.getItemName(idname)
-          step.text = step.text..lang.delivery.item(name,amount).."<br />"
+          step.text = step.text..lang.delivery.item({name,amount}).."<br />"
         end
 
         mdata.steps = {step}
