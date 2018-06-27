@@ -1,4 +1,4 @@
-= vRP-basic-mission: 
+= vRP-basic-mission
 vRP Extension - some basic missions
 
 For https://github.com/ImagicTheCat/vRP, add delivery and repair missions.
