@@ -1,8 +1,6 @@
 
 local cfg = {}
 
-cfg.lang = "en"
-
 -- REPAIR
 
 -- map of permission -> repair config
@@ -84,8 +82,8 @@ cfg.delivery = {
   ["mission.delivery.food"] = {
     positions = common_delivery_positions,
     items = {
-      ["tacos"] = {0,8,50},
-      ["water"] = {0,8,40}
+      ["edible|tacos"] = {0,8,50},
+      ["edible|water"] = {0,8,40}
     }
   }
 }
