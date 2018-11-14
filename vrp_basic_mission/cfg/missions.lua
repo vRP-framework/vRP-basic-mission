@@ -88,4 +88,18 @@ cfg.delivery = {
   }
 }
 
+-- PAYCHECK
+
+-- map of permission => paycheck config
+--- position: paycheck position
+--- reward: paycheck amount
+--- interval: number of minutes between paychecks
+cfg.paycheck = {
+  ["mission.paycheck.police"] = {
+    position = {447.12612915039,-975.64959716797,30.689586639404},
+    reward = 3500,
+    interval = 30 
+  }
+}
+
 return cfg

@@ -5,6 +5,10 @@ local lang = {
   delivery = {
     title = "Delivery",
     item = "- {2} {1}"
+  },
+  paycheck = {
+    title = "Paycheck",
+    text = "Get paycheck of {1} $."
   }
 }
 

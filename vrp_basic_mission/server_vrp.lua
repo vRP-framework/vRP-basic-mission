@@ -13,6 +13,8 @@ function basic_mission:__construct()
   self.luang:loadLocale(vRP.cfg.lang, module("vrp_basic_mission", "cfg/lang/"..vRP.cfg.lang))
   self.lang = self.luang.lang[vRP.cfg.lang]
 
+  self.paychecks_elapsed = {} -- map of paycheck permission => elapsed mission ticks
+
   -- task: mission
   local function task_mission()
     SetTimeout(60000,task_mission)
@@ -24,6 +26,39 @@ function basic_mission:__construct()
 end
 
 function basic_mission:taskMission()
+  -- PAYCHECK
+  for perm,mission in pairs(self.cfg.paycheck) do -- each repair perm def
+    local ticks = (self.paychecks_elapsed[perm] or 0)+1
+    if ticks >= mission.interval then
+      ticks = 0
+      -- add missions to users
+      local users = vRP.EXT.Group:getUsersByPermission(perm)
+      for _,user in pairs(users) do
+        if user.spawns > 0 and not user:hasMission() then
+          -- build mission
+          local mdata = {}
+          mdata.name = self.lang.paycheck.title()
+
+          local step = {
+            text = self.lang.paycheck.text({mission.reward}),
+            onenter = function(user)
+              user:giveWallet(mission.reward)
+              vRP.EXT.Base.remote._notify(user.source,lang.money.received({mission.reward}))
+              user:nextMissionStep()
+            end,
+            position = mission.position
+          }
+
+          mdata.steps = {step}
+
+          user:startMission(mdata)
+        end
+      end
+    end
+
+    self.paychecks_elapsed[perm] = ticks
+  end
+
   -- REPAIR
   for perm,mission in pairs(self.cfg.repair) do -- each repair perm def
     -- add missions to users
@@ -125,6 +160,7 @@ function basic_mission:taskMission()
       end
     end
   end
+
 end
 
 vRP:registerExtension(basic_mission)
